@@ -22,6 +22,19 @@ def optimize_prompt(user_prompt, category, tone, length):
         length=length
     )
 
-    response = model.generate_content(prompt)
+    try:
+        response = model.generate_content(prompt)
+        return response.text
 
-    return response.text
+    except Exception as e:
+
+        error_message = str(e)
+
+        if "429" in error_message or "quota" in error_message.lower():
+            return "⚠️ Gemini API quota exceeded. Please wait about a minute and try again."
+
+        elif "API_KEY" in error_message or "api key" in error_message.lower():
+            return "⚠️ Invalid Gemini API key. Please check your .env file."
+
+        else:
+            return f"⚠️ Something went wrong:\n\n{error_message}"
