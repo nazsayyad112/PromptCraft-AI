@@ -1,15 +1,15 @@
 import os
+import streamlit as st
 import google.generativeai as genai
 from dotenv import load_dotenv
 from prompt_templates import PROMPT_TEMPLATE
 
-# Load API key from .env
 load_dotenv()
 
-# Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY"))
 
-# Load Gemini model
+genai.configure(api_key=api_key)
+
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
@@ -34,7 +34,7 @@ def optimize_prompt(user_prompt, category, tone, length):
             return "⚠️ Gemini API quota exceeded. Please wait about a minute and try again."
 
         elif "API_KEY" in error_message or "api key" in error_message.lower():
-            return "⚠️ Invalid Gemini API key. Please check your .env file."
+            return f"⚠️ Invalid Gemini API key.\n\n{error_message}"
 
         else:
             return f"⚠️ Something went wrong:\n\n{error_message}"
